@@ -233,6 +233,7 @@ class Layer(object):
         non_trainable_weights: list of variables.
         regularizers: list of regularizers.
         constraints: dict mapping weights to constraints.
+        lr_multipliers: dict mapping weights to learning rate multipliers.
 
     # Methods
         call(x, mask=None): where the layer's logic lives.
@@ -286,6 +287,7 @@ class Layer(object):
         self.non_trainable_weights = []
         self.regularizers = []
         self.constraints = {}  # dict {tensor: constraint instance}
+        self.lr_multipliers = {}
         self.built = False
 
         # these properties should be set by the user via keyword arguments.
@@ -928,6 +930,7 @@ class InputLayer(Layer):
         self.non_trainable_weights = []
         self.regularizers = []
         self.constraints = {}
+        self.lr_multipliers = {}
 
         if not name:
             prefix = 'input'
@@ -1088,6 +1091,7 @@ class Merge(Layer):
         self.inbound_nodes = []
         self.outbound_nodes = []
         self.constraints = {}
+        self.lr_multipliers = {}
         self.regularizers = []
         self.trainable_weights = []
         self.non_trainable_weights = []
@@ -1845,6 +1849,18 @@ class Container(Layer):
                                     'for one weight tensor: ' + str(key))
                 cons[key] = value
         return cons
+
+    @property
+    def lr_multipliers(self):
+        lrmuls = {}
+        for layer in self.layers:
+            for key, value in layer.lr_multipliers.items():
+                if key in lrmuls:
+                    raise Exception('Received multiple learning rate '
+                                    'multipliers for one weight tensor: ' +
+                                    str(key))
+                lrmuls[key] = value
+        return lrmuls
 
     @property
     def regularizers(self):

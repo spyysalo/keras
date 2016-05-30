@@ -660,8 +660,10 @@ class Model(Container):
             trainable_weights = []
             for layer in self.layers:
                 trainable_weights += collect_trainable_weights(layer)
-
-            training_updates = self.optimizer.get_updates(trainable_weights, self.constraints, self.total_loss)
+            training_updates = self.optimizer.get_updates(trainable_weights,
+                                                          self.constraints,
+                                                          self.lr_multipliers,
+                                                          self.total_loss)
             updates = self.updates + training_updates
 
             # returns loss and metrics. Updates weights at each call.

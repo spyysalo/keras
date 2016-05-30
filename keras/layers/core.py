@@ -550,6 +550,9 @@ class Dense(Layer):
             (eg. maxnorm, nonneg), applied to the main weights matrix.
         b_constraint: instance of the [constraints](../constraints.md) module,
             applied to the bias.
+        W_lr_multiplier: Multiplier applied to the learning rate of the main
+             weights matrix.
+        b_lr_multiplier: Multiplier applied to the learning rate of the bias.
         bias: whether to include a bias (i.e. make the layer affine rather than linear).
         input_dim: dimensionality of the input (integer).
             This argument (or alternatively, the keyword argument `input_shape`)
@@ -564,6 +567,7 @@ class Dense(Layer):
     def __init__(self, output_dim, init='glorot_uniform', activation='linear', weights=None,
                  W_regularizer=None, b_regularizer=None, activity_regularizer=None,
                  W_constraint=None, b_constraint=None,
+                 W_lr_multiplier=None, b_lr_multiplier=None,
                  bias=True, input_dim=None, **kwargs):
         self.init = initializations.get(init)
         self.activation = activations.get(activation)
@@ -576,6 +580,9 @@ class Dense(Layer):
 
         self.W_constraint = constraints.get(W_constraint)
         self.b_constraint = constraints.get(b_constraint)
+
+        self.W_lr_multiplier = W_lr_multiplier
+        self.b_lr_multiplier = b_lr_multiplier
 
         self.bias = bias
         self.initial_weights = weights
@@ -619,6 +626,12 @@ class Dense(Layer):
         if self.bias and self.b_constraint:
             self.constraints[self.b] = self.b_constraint
 
+        self.lr_multipliers = {}
+        if self.W_lr_multiplier is not None:
+            self.lr_multipliers[self.W] = self.W_lr_multiplier
+        if self.bias and self.b_lr_multiplier is not None:
+            self.lr_multipliers[self.b] = self.b_lr_multiplier
+
         if self.initial_weights is not None:
             self.set_weights(self.initial_weights)
             del self.initial_weights
@@ -642,6 +655,8 @@ class Dense(Layer):
                   'activity_regularizer': self.activity_regularizer.get_config() if self.activity_regularizer else None,
                   'W_constraint': self.W_constraint.get_config() if self.W_constraint else None,
                   'b_constraint': self.b_constraint.get_config() if self.b_constraint else None,
+                  'W_lr_multiplier': self.W_lr_multiplier,
+                  'b_lr_multiplier': self.b_lr_multiplier,
                   'bias': self.bias,
                   'input_dim': self.input_dim}
         base_config = super(Dense, self).get_config()
@@ -720,6 +735,9 @@ class MaxoutDense(Layer):
             (eg. maxnorm, nonneg), applied to the main weights matrix.
         b_constraint: instance of the [constraints](../constraints.md) module,
             applied to the bias.
+        W_lr_multiplier: Multiplier applied to the learning rate of the main
+            weights matrix.
+        b_lr_multiplier: Multiplier applied to the learning rate of the bias.
         bias: whether to include a bias (i.e. make the layer affine rather than linear).
         input_dim: dimensionality of the input (integer).
             This argument (or alternatively, the keyword argument `input_shape`)
@@ -738,6 +756,7 @@ class MaxoutDense(Layer):
                  init='glorot_uniform', weights=None,
                  W_regularizer=None, b_regularizer=None, activity_regularizer=None,
                  W_constraint=None, b_constraint=None,
+                 W_lr_multiplier=None, b_lr_multiplier=None,
                  bias=True, input_dim=None, **kwargs):
         self.output_dim = output_dim
         self.nb_feature = nb_feature
@@ -749,6 +768,9 @@ class MaxoutDense(Layer):
 
         self.W_constraint = constraints.get(W_constraint)
         self.b_constraint = constraints.get(b_constraint)
+
+        self.W_lr_multiplier = W_lr_multiplier
+        self.b_lr_multiplier = b_lr_multiplier
 
         self.bias = bias
         self.initial_weights = weights
@@ -792,6 +814,12 @@ class MaxoutDense(Layer):
         if self.bias and self.b_constraint:
             self.constraints[self.b] = self.b_constraint
 
+        self.lr_multipliers = {}
+        if self.W_lr_multiplier is not None:
+            self.lr_multipliers[self.W] = self.W_lr_multiplier
+        if self.bias and self.b_lr_multiplier is not None:
+            self.lr_multipliers[self.b] = self.b_lr_multiplier
+
         if self.initial_weights is not None:
             self.set_weights(self.initial_weights)
             del self.initial_weights
@@ -817,6 +845,8 @@ class MaxoutDense(Layer):
                   'activity_regularizer': self.activity_regularizer.get_config() if self.activity_regularizer else None,
                   'W_constraint': self.W_constraint.get_config() if self.W_constraint else None,
                   'b_constraint': self.b_constraint.get_config() if self.b_constraint else None,
+                  'W_lr_multiplier': self.W_lr_multiplier,
+                  'b_lr_multiplier': self.b_lr_multiplier,
                   'bias': self.bias,
                   'input_dim': self.input_dim}
         base_config = super(MaxoutDense, self).get_config()
@@ -852,6 +882,9 @@ class Highway(Layer):
             (eg. maxnorm, nonneg), applied to the main weights matrix.
         b_constraint: instance of the [constraints](../constraints.md) module,
             applied to the bias.
+        W_lr_multiplier: Multiplier applied to the learning rate of the main
+            weights matrix.
+        b_lr_multiplier: Multiplier applied to the learning rate of the bias.
         bias: whether to include a bias (i.e. make the layer affine rather than linear).
         input_dim: dimensionality of the input (integer).
             This argument (or alternatively, the keyword argument `input_shape`)
@@ -870,6 +903,7 @@ class Highway(Layer):
                  activation='linear', weights=None,
                  W_regularizer=None, b_regularizer=None, activity_regularizer=None,
                  W_constraint=None, b_constraint=None,
+                 W_lr_multiplier=None, b_lr_multiplier=None,
                  bias=True, input_dim=None, **kwargs):
         self.init = initializations.get(init)
         self.transform_bias = transform_bias
@@ -881,6 +915,9 @@ class Highway(Layer):
 
         self.W_constraint = constraints.get(W_constraint)
         self.b_constraint = constraints.get(b_constraint)
+
+        self.W_lr_multiplier = W_lr_multiplier
+        self.b_lr_multiplier = b_lr_multiplier
 
         self.bias = bias
         self.initial_weights = weights
@@ -929,6 +966,12 @@ class Highway(Layer):
         if self.bias and self.b_constraint:
             self.constraints[self.b] = self.b_constraint
 
+        self.lr_multipliers = {}
+        if self.W_lr_multiplier is not None:
+            self.lr_multipliers[self.W] = self.W_lr_multiplier
+        if self.bias and self.b_lr_multiplier is not None:
+            self.lr_multipliers[self.b] = self.b_lr_multiplier
+
         if self.initial_weights is not None:
             self.set_weights(self.initial_weights)
             del self.initial_weights
@@ -955,6 +998,8 @@ class Highway(Layer):
                   'activity_regularizer': self.activity_regularizer.get_config() if self.activity_regularizer else None,
                   'W_constraint': self.W_constraint.get_config() if self.W_constraint else None,
                   'b_constraint': self.b_constraint.get_config() if self.b_constraint else None,
+                  'W_lr_multiplier': self.W_lr_multiplier,
+                  'b_lr_multiplier': self.b_lr_multiplier,
                   'bias': self.bias,
                   'input_dim': self.input_dim}
         base_config = super(Highway, self).get_config()
@@ -999,6 +1044,9 @@ class TimeDistributedDense(Layer):
             (eg. maxnorm, nonneg), applied to the main weights matrix.
         b_constraint: instance of the [constraints](../constraints.md) module,
             applied to the bias.
+        W_lr_multiplier: Multiplier applied to the learning rate of the main
+            weights matrix.
+        b_lr_multiplier: Multiplier applied to the learning rate of the bias.
         bias: whether to include a bias (i.e. make the layer affine rather than linear).
         input_dim: dimensionality of the input (integer).
             This argument (or alternatively, the keyword argument `input_shape`)
@@ -1011,6 +1059,7 @@ class TimeDistributedDense(Layer):
                  init='glorot_uniform', activation='linear', weights=None,
                  W_regularizer=None, b_regularizer=None, activity_regularizer=None,
                  W_constraint=None, b_constraint=None,
+                 W_lr_multiplier=None, b_lr_multiplier=None,
                  bias=True, input_dim=None, input_length=None, **kwargs):
         warnings.warn('TimeDistributedDense is deprecated, '
                       'please use TimeDistributed(Dense(...)) instead.')
@@ -1024,6 +1073,9 @@ class TimeDistributedDense(Layer):
 
         self.W_constraint = constraints.get(W_constraint)
         self.b_constraint = constraints.get(b_constraint)
+
+        self.W_lr_multiplier = W_lr_multiplier
+        self.b_lr_multiplier = b_lr_multiplier
 
         self.bias = bias
         self.initial_weights = weights
@@ -1066,6 +1118,12 @@ class TimeDistributedDense(Layer):
             self.constraints[self.W] = self.W_constraint
         if self.bias and self.b_constraint:
             self.constraints[self.b] = self.b_constraint
+
+        self.lr_multipliers = {}
+        if self.W_lr_multiplier is not None:
+            self.lr_multipliers[self.W] = self.W_lr_multiplier
+        if self.bias and self.b_lr_multiplier is not None:
+            self.lr_multipliers[self.b] = self.b_lr_multiplier
 
         if self.initial_weights is not None:
             self.set_weights(self.initial_weights)
@@ -1111,6 +1169,8 @@ class TimeDistributedDense(Layer):
                   'activity_regularizer': self.activity_regularizer.get_config() if self.activity_regularizer else None,
                   'W_constraint': self.W_constraint.get_config() if self.W_constraint else None,
                   'b_constraint': self.b_constraint.get_config() if self.b_constraint else None,
+                  'W_lr_multiplier': self.W_lr_multiplier,
+                  'b_lr_multiplier': self.b_lr_multiplier,
                   'bias': self.bias,
                   'input_dim': self.input_dim,
                   'input_length': self.input_length}
