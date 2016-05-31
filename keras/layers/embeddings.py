@@ -41,6 +41,8 @@ class Embedding(Layer):
         (eg. L1 or L2 regularization), applied to the embedding matrix.
       W_constraint: instance of the [constraints](../constraints.md) module
           (eg. maxnorm, nonneg), applied to the embedding matrix.
+      W_lr_multiplier: Multiplier applied to the learning rate of the main
+          weights matrix.
       mask_zero: Whether or not the input value 0 is a special "padding"
           value that should be masked out.
           This is useful for [recurrent layers](recurrent.md) which may take
@@ -69,6 +71,7 @@ class Embedding(Layer):
                  init='uniform', input_length=None,
                  W_regularizer=None, activity_regularizer=None,
                  W_constraint=None,
+                 W_lr_multiplier=None,
                  mask_zero=False,
                  weights=None, dropout=0., **kwargs):
         self.input_dim = input_dim
@@ -79,6 +82,8 @@ class Embedding(Layer):
         self.dropout = dropout
 
         self.W_constraint = constraints.get(W_constraint)
+
+        self.W_lr_multiplier = W_lr_multiplier
 
         self.W_regularizer = regularizers.get(W_regularizer)
         self.activity_regularizer = regularizers.get(activity_regularizer)
@@ -98,6 +103,10 @@ class Embedding(Layer):
         self.constraints = {}
         if self.W_constraint:
             self.constraints[self.W] = self.W_constraint
+
+        self.lr_multipliers = {}
+        if self.W_lr_multiplier is not None:
+            self.lr_multipliers[self.W] = self.W_lr_multiplier
 
         self.regularizers = []
         if self.W_regularizer:
@@ -144,6 +153,7 @@ class Embedding(Layer):
                   'activity_regularizer': self.activity_regularizer.get_config() if self.activity_regularizer else None,
                   'W_regularizer': self.W_regularizer.get_config() if self.W_regularizer else None,
                   'W_constraint': self.W_constraint.get_config() if self.W_constraint else None,
+                  'W_lr_multiplier': self.W_lr_multiplier,
                   'dropout': self.dropout}
         base_config = super(Embedding, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
